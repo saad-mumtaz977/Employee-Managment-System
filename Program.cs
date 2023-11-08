@@ -54,7 +54,11 @@ namespace EmployeeManagmentSystem
                 Console.WriteLine("------------------------------------");
 
                 Console.Write("\nEnter Your Choice: ");
-                choice = Convert.ToInt32(Console.ReadLine());
+                bool chc = int.TryParse(Console.ReadLine(), out choice);
+                if (!chc) { 
+                    Console.WriteLine("You didnt enter the input in correct format");
+                    goto checkpoint;
+                }
 
                 switch (choice)
                 {
