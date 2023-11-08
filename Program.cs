@@ -3,9 +3,11 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 
 namespace EmployeeManagmentSystem
 {
@@ -22,28 +24,10 @@ namespace EmployeeManagmentSystem
         public int TrainingPeriod { get; set; }
         public string TechStack { get; set; }
 
-        public void SetDetails()
-        {
-            Console.WriteLine("Please Provide Folloing Details: ");
-
-            Console.Write("Employee Id: ");
-            Id = Convert.ToInt32(Console.ReadLine());
-
-            Console.Write("Employee Name: ");
-            Name = Console.ReadLine();
-
-            Console.Write("Employee Salary: ");
-            Salary = Convert.ToDouble(Console.ReadLine());
-
-            Console.Write("Employee Team: ");
-            Team = Console.ReadLine();
-
-            Console.Write("Training Period (month(s)): ");
-            TrainingPeriod = Convert.ToInt32(Console.ReadLine());
-
-            Console.Write("Tech Stack: ");
-            TechStack = Console.ReadLine();
-        }
+        //public void SetDetails()
+        //{
+            
+        //}
 
         public override string ToString()
         {
@@ -58,9 +42,10 @@ namespace EmployeeManagmentSystem
         {
             int choice;
             Console.ForegroundColor = ConsoleColor.DarkRed;
-            Console.Title = "Employee Managment System";
+            Console.Title = "Employee Managment System" ;
             do
             {
+            checkpoint:
                 Console.WriteLine("\n1- View All Employees\n");
                 Console.WriteLine("\n2- View Employee by ID\n");
                 Console.WriteLine("\n3- Add Employee\n");
@@ -76,13 +61,13 @@ namespace EmployeeManagmentSystem
                     case 1:
                         if (ASEs.Count == 0)
                         {
-                            Console.WriteLine("\nEmployee List is Emplty :(\n");
+                            Console.WriteLine("\nEmployee List is Empty At the moment\n");
                         }
                         else
                         {
                             foreach (var ase in ASEs)
                             {
-                                Console.WriteLine(ase);
+                                Console.WriteLine(ase); 
                             }
                         }
                         break;
@@ -92,46 +77,118 @@ namespace EmployeeManagmentSystem
                             Console.WriteLine("\nEmployee List is Empty At the moment\n");
                             break;
                         }
-                        Console.Write("\nEnter ID: ");
-                        int id = Convert.ToInt32(Console.ReadLine());
-                        ASE ase_temp = ASEs.Find(a => a.Id == id);
-                        if (ase_temp != null)
+                        Console.Write("\nEnter ID (0 to go back): ");
+                        try
                         {
-                            Console.WriteLine(ase_temp);
-                        }
-                        else
+                            int id = Convert.ToInt32(Console.ReadLine());
+                            if (id == 0)
+                            {
+                                goto checkpoint;
+                            }
+                            ASE ase_temp = ASEs.Find(a => a.Id == id);
+                            if (ase_temp != null)
+                            {
+                                Console.WriteLine(ase_temp);
+                            }
+                            else
+                            {
+                                Console.WriteLine("\nNo such Employee with Id: " + id + "\n");
+                            }
+                        }catch (Exception e)
                         {
-                            Console.WriteLine("\nNo such Employee with Id: " + id + "\n");
+                            Console.WriteLine(e.Message);
                         }
                         break;
                     case 3:
                         ASE aSE = new ASE();
-                        aSE.SetDetails();
+
+                        Console.WriteLine("Please Provide Folloing Details: ");
+
+                    stmt1:
+                        Console.Write("Employee Id (0 to go back): ");
+                        try
+                        {
+                            int Id = Convert.ToInt32(Console.ReadLine());
+                            if (Id == 0)
+                            {
+                                goto checkpoint;
+                            }
+                            aSE.Id = Id;
+                        }
+                        catch (Exception ex)
+                        {
+                            Console.WriteLine("Enter Id in an int format");
+                            goto stmt1;
+                        }
+
+                        Console.Write("Employee Name: ");
+                        aSE.Name = Console.ReadLine();
+
+                    stmt2:
+                        Console.Write("Employee Salary: ");
+                        try
+                        {
+                            aSE.Salary = Convert.ToDouble(Console.ReadLine());
+                        }
+                        catch (Exception ex)
+                        {
+                            Console.WriteLine("Enter Salary in double format");
+                            goto stmt2;
+                        }
+
+                        Console.Write("Employee Team: ");
+                        aSE.Team = Console.ReadLine();
+                    stmt3:
+                        try
+                        {
+                            Console.Write("Training Period (month(s)): ");
+                            aSE.TrainingPeriod = Convert.ToInt32(Console.ReadLine());
+                        }
+                        catch (Exception ex)
+                        {
+                            Console.WriteLine("Enter Training Period in int format");
+                            goto stmt3;
+                        }
+
+                        Console.Write("Tech Stack: ");
+                        aSE.TechStack = Console.ReadLine();
+
+
+
                         ASEs.Add(aSE);
                         Console.WriteLine("\nEmployee Added Successfully!\n");
                         break;
+
                     case 4:
                         if (ASEs.Count == 0)
                         {
                             Console.WriteLine("\nEmployee List is Empty At the moment\n");
                             break;
                         }
-                        Console.Write("\nEnter Id of Employee to Remove: ");
-                        int id4 = Convert.ToInt32(Console.ReadLine());
-                        ASE ase4 = ASEs.Find(a => a.Id == id4);
-                        if (ase4 != null)
+                        try
                         {
-                            Console.WriteLine("Are You Sure You Want to Delete Employee with Id: " + id4 + " (Y or N)");
-                            char inp = Convert.ToChar(Console.ReadLine());
-                            if (inp == 'Y' || inp == 'y')
+                            Console.Write("\nEnter Id of Employee to Remove (0 to go back): ");
+
+                            int id4 = Convert.ToInt32(Console.ReadLine());
+
+                            ASE ase4 = ASEs.Find(a => a.Id == id4);
+                            if (ase4 != null)
                             {
-                                ASEs.Remove(ase4);
-                                Console.WriteLine("Employee Deleted Successfully");
+                                Console.WriteLine("Are You Sure You Want to Delete Employee with Id: " + id4 + " (Y or N)");
+                                char inp = Convert.ToChar(Console.ReadLine());
+                                if (inp == 'Y' || inp == 'y')
+                                {
+                                    ASEs.Remove(ase4);
+                                    Console.WriteLine("Employee Deleted Successfully");
+                                }
                             }
-                        }
-                        else
+                            else
+                            {
+                                Console.WriteLine("\nNo such Employee with Id: " + id4 + "\n");
+                            }
+                        }catch (Exception ex)
                         {
-                            Console.WriteLine("\nNo such Employee with Id: " + id4 + "\n");
+                            Console.WriteLine(ex.Message);
                         }
                         break;
 
